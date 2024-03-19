@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout1}">
+
+<th:block layout:fragment="content">
+
+    <script layout:fragment="javascript" th:inline="javascript">
+        $(document).ready(function() {
+            $(".btnList").on("click", function(e){
+                e.preventDefault();
+            location.href = "/board/list";
+            });
+        });
+
+        $(document).ready(function() {
+            $(".btnBack").on("click", function(e){
+                e.preventDefault();
+                var bno = [[${board.bno}]];
+                location.href = "/board/view?bno=" + bno;
+            });
+        });
+    </script>
+
+
+    <div class="container p-3">
+        <h3>게시글 수정</h3>
+        <form action="/board/update" method="post">
+            <input type="hidden" name="bno" th:value="${board.bno}">
+
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="basic-addon1">제목</span>
+                <input type="text" name="title" class="form-control" placeholder="제목"
+                       aria-label="title" aria-describedby="basic-addon1"
+                        th:value="${board.title}">
+            </div>
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="basic-addon2">내용</span>
+                <input type="text" name="content" class="form-control" placeholder="내용"
+                       aria-label="content" aria-describedby="basic-addon2"
+                       th:value="${board.content}">
+            </div>
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="basic-addon3">작성자</span>
+                <input type="text" name="writer" class="form-control" placeholder="작성자"
+                       aria-label="writer" aria-describedby="basic-addon3"
+                       th:value="${board.writer}">
+            </div>
+            <div class="input-group mb-3">
+                <input type="file" multiple>
+                <button type="button" class="uploadBtn">Upload</button>
+            </div>
+            <div class="input-group mb-3">
+                <button type="submit" class="btn btn-secondary" style="margin-right: 10px;">수정</button>
+<!--                <button type="button" class="btn btn-primary" style="margin-right: 10px;">삭제</button>-->
+                <button type="reset" class="btn btn-light" style="margin-right: 10px;">취소</button>
+                <button type="submit" class="btn btn-dark btnBack" style="margin-right: 10px;">돌아가기</button>
+                <button type="submit" class="btn btn-primary btnList" style="margin-right: 10px;">목록</button>
+            </div>
+<!--            <div class="uploadResult">-->
+<!--                <div>-->
+<!--                    <img>-->
+<!--                    -->
+<!--                </div>-->
+<!--            </div>-->
+        </form>
+    </div>
+</th:block>
+</html>

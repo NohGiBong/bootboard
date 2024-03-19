@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout1}">
+
+<th:block layout:fragment="content">
+
+    <style layout:fragment="css" th:inline="css">
+        .fieldError {
+            color: red;
+        }
+    </style>
+
+    <div class="container p-3">
+        <h3>게시글 등록</h3>
+        <form action="/board/register" method="post" th:object="${boardDTO}">
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="basic-addon1">제목</span>
+                <input type="text" th:field="*{title}" class="form-control" placeholder="제목" aria-label="title" aria-describedby="basic-addon1">
+                <br>
+                <p th:if="${#fields.hasErrors('title')}" th:errors="*{title}" class="fieldError">데이터 오류</p>
+            </div>
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="basic-addon2">내용</span>
+                <input type="text" th:field="*{content}" class="form-control" placeholder="내용" aria-label="content" aria-describedby="basic-addon2">
+            </div>
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="basic-addon3">작성자</span>
+                <input type="text" th:field="*{writer}" class="form-control" placeholder="작성자" aria-label="writer" aria-describedby="basic-addon3">
+                <p th:if="${#fields.hasErrors('writer')}" th:errors="*{writer}" class="fieldError">데이터 오류</p>
+            </div>
+
+            <div class="input-group mb-3">
+                <input name="uploadFiles" type="file" multiple>
+                <button type="button" class="uploadBtn">Upload</button>
+
+                <div class="uploadResult">
+
+                </div>
+            </div>
+
+            <div class="input-group mb-3">
+                <button type="submit" class="btn btn-secondary">등록</button>
+                <button type="reset" class="btn btn-light">취소</button>
+            </div>
+        </form>
+    </div>
+</th:block>
+</html>
