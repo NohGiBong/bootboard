@@ -51,21 +51,21 @@
                     origin_last = arr.last;
 
                     $.each(arr.content, function(idx, reply) {
-                        str += '<div class="card-body" data-rno="${reply.rno}">
+                        str += `<div class="card-body" data-rno="${reply.rno}">
                                     <b>${reply.rno}</b>
-                                    <h5 class="card-title">${reply.title}</h5>
+                                    <h5 class="card-title">${reply.text}</h5>
                                     <h6 class="card-subtitle mb2 text-muted">${reply.replyer}</h6>
-                                    <p class="card-text">formatTime(${reply.regDate})</p>
-                                </div>';
+                                    <p class="card-text">${formatTime(reply.regDate)}</p>
+                                </div>`;
                     console.log("arr.content: " + arr.content);
-                    console.log("arr.content,length: " + arr.content);
+                    console.log("arr.content,length: " + arr.content.length);
 
                     // 마지막 댓글에 더보기 버튼 추가
                     if(!arr.last && ((idx + 1 ) == arr.content.length)) {
                         str +=
-                            '<div class=d-grid gap-2">
+                            `<div class=d-grid gap-2">
                                     <button id="more" type="button" class="btn btn-outline-dark paging-more">더보기</button>
-                                </div>';
+                                </div>`;
                         }
                     });
                     $(".replyList").html(str);
