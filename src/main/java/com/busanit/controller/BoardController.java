@@ -2,7 +2,10 @@ package com.busanit.controller;
 
 
 import com.busanit.domain.BoardDTO;
+import com.busanit.entity.Board;
+import com.busanit.entity.BoardAttach;
 import com.busanit.repository.BoardRepository;
+import com.busanit.service.BoardAttachService;
 import com.busanit.service.BoardService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,8 +32,9 @@ import java.util.List;
 public class BoardController {
 
     private final BoardService boardService;
+    private final BoardAttachService boardAttachService;
+//    private final BoardRepository boardRepository;
 
-    private final BoardRepository boardRepository;
 
 //    @GetMapping("/list")
 //    public String list(Model model,
@@ -95,7 +99,10 @@ public class BoardController {
             return "board/register";
         }
 
-        boardService.register(boardDTO);
+        Board board = boardService.register(boardDTO);
+
+        // 첨부파일 있을 경우 DB에 첨부파일 정보 저장
+        boardAttachService.saveWithFiles(boardDTO, board);
 
         return "redirect:/board/list";
     }
@@ -104,7 +111,11 @@ public class BoardController {
     public String view(Long bno, Model model) {
 
         BoardDTO boardDTO = boardService.get(bno);
+//        List<BoardAttach> attachlist =
+
+
         model.addAttribute("board", boardDTO);
+        model.addAttribute("attachList", attachlist);
 
         return "board/view";
     }

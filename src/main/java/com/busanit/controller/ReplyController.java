@@ -34,4 +34,20 @@ public class ReplyController {
 
         return new ResponseEntity<>(replyService.getReplyList(bno, pageable), HttpStatus.OK);
     }
+
+    @DeleteMapping("/{rno}")
+    public ResponseEntity<String> remove(@PathVariable("rno") Long rno) {
+
+        replyService.remove(rno);
+
+        return new ResponseEntity<>("success", HttpStatus.OK);
+    }
+
+    @PutMapping("/{rno}")
+    public ResponseEntity<String> modify(@RequestBody ReplyDTO replyDTO) {
+
+        replyService.modify(replyDTO);
+
+        return new ResponseEntity<>("success", HttpStatus.OK);
+    }
 }

@@ -50,10 +50,12 @@ public class BoardService {
         return BoardDTO.toDTOList(boardList);
     }
 
+    public Board register(BoardDTO boardDTO) {
+        Board board = Board.toEntity(boardDTO);
 
-    public void register(BoardDTO boardDTO) {
+        boardRepository.save(board);
 
-        boardRepository.save(Board.toEntity(boardDTO));
+        return board;
     }
 
     public BoardDTO get(Long bno) {
@@ -72,3 +74,9 @@ public class BoardService {
         boardRepository.deleteById(bno);
     }
 }
+
+
+
+
+
+

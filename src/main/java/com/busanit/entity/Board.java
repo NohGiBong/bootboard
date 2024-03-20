@@ -40,6 +40,10 @@ public class Board {
     @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE)
     List<Reply> replyList;
 
+    @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE)
+    List<BoardAttach> boardAttachList;
+
+
     // DTO -> Entity
     public static Board toEntity(BoardDTO dto) {
         return Board.builder()

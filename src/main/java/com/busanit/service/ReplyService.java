@@ -31,4 +31,13 @@ public class ReplyService {
 
         return ReplyDTO.toDTOList(replyList);
     }
+
+    public void remove(Long rno) {
+        replyRepository.deleteById(rno);
+    }
+
+    public void modify(ReplyDTO replyDTO) {
+
+        replyRepository.save(Reply.toEntity(replyDTO));
+    }
 }
