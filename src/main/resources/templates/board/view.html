@@ -248,9 +248,12 @@
                 <button type="button" class="btn btn-primary"
                     th:onclick="|location.href='@{/board/list}'|">목록</button>
             </div>
-            <div class="input-group mb-3">
-                <img class="card-img-top">
-            </div>
+            <th:block th:each="attach : ${attachList}">
+                <div class="input-group mb-3" th:if="${attach.fileName != null && attach.fileName.length() > 0}">
+                    <img class="card-img-top" th:src="|/display?fileName=${attach.fileName}|">
+                    <input type="hidden" name="fileNames" th:value="${attach.fileName}">
+                </div>
+            </th:block>
         </form>
     </div>
     <div>

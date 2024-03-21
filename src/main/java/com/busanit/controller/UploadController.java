@@ -2,6 +2,8 @@ package com.busanit.controller;
 
 
 import com.busanit.domain.UploadResultDTO;
+import com.busanit.service.BoardAttachService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import net.coobird.thumbnailator.Thumbnailator;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,10 +31,14 @@ import java.util.UUID;
 
 @RestController
 @Log4j2
+@RequiredArgsConstructor
 public class UploadController {
+    private final BoardAttachService boardAttachService;
+
 
     @Value("${com.busanit.upload.path}")    // application.properties의 변수
     private String uploadPath;
+
 
     @PostMapping("/uploadAjax")
     public ResponseEntity<List<UploadResultDTO>> uploadFile(MultipartFile[] uploadFiles) {
@@ -120,6 +126,29 @@ public class UploadController {
     @PostMapping("/removeFile")
     public ResponseEntity<Boolean> removeFile(String fileName) {
         String srcFileName = null;
+
+        try {
+            srcFileName = URLDecoder.decode(fileName, "UTF-8");
+            //원본 파일 삭제
+            File file = new File(uploadPath + File.separator + srcFileName);
+            boolean result = file.delete();
+
+            //썸네일 파일 삭제
+            File thumbnail = new File(file.getParent(), "s_" + file.getName());
+            result = thumbnail.delete();
+
+            return new ResponseEntity<>(result, HttpStatus.OK);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(false, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/removeFileDb")
+    public ResponseEntity<Boolean> removeFileWithDb(String fileName, Long attachNo) {
+        String srcFileName = null;
+
+        boardAttachService.deleteByAttachNo(attachNo);
 
         try {
             srcFileName = URLDecoder.decode(fileName, "UTF-8");

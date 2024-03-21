@@ -1,10 +1,8 @@
 package com.busanit.controller;
 
-
+import com.busanit.domain.BoardAttachDTO;
 import com.busanit.domain.BoardDTO;
 import com.busanit.entity.Board;
-import com.busanit.entity.BoardAttach;
-import com.busanit.repository.BoardRepository;
 import com.busanit.service.BoardAttachService;
 import com.busanit.service.BoardService;
 import jakarta.validation.Valid;
@@ -16,14 +14,11 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -33,19 +28,6 @@ public class BoardController {
 
     private final BoardService boardService;
     private final BoardAttachService boardAttachService;
-//    private final BoardRepository boardRepository;
-
-
-//    @GetMapping("/list")
-//    public String list(Model model,
-//                       @PageableDefault(size = 5, sort = "bno",
-//                            direction = Sort.Direction.DESC)Pageable pageable) {
-//
-//        List<BoardDTO> boardList = boardService.getBoardDTOList();
-//        model.addAttribute("list", boardList);
-//
-//        return "board/list";
-//    }
 
     @GetMapping("/list")
     public String list(Model model,
@@ -53,7 +35,6 @@ public class BoardController {
                        @RequestParam(defaultValue = "") String keyword,
                        @PageableDefault(size = 5, sort = "bno",
                                direction = Sort.Direction.DESC)Pageable pageable) {
-
         Page<BoardDTO> boardDTOList = null;
 
         if(searchType.equals("title")) {
@@ -61,19 +42,16 @@ public class BoardController {
         } else if(searchType.equals("content")) {
             boardDTOList = boardService.getBoardContentPageList(keyword, pageable);
         } else {
-        boardDTOList = boardService.getBoardPageList(pageable);
+            boardDTOList = boardService.getBoardPageList(pageable);
         }
 
         model.addAttribute("list", boardDTOList);
 
         int startPage = Math.max(1, boardDTOList.getPageable().getPageNumber() - 5);
-        model.addAttribute("startPage", startPage);
-
         int endPage = Math.min(boardDTOList.getTotalPages(), boardDTOList.getPageable().getPageNumber() + 5);
+        model.addAttribute("startPage", startPage);
         model.addAttribute("endPage", endPage);
-
         model.addAttribute("searchType", searchType);
-
         model.addAttribute("keyword", keyword);
 
         return "board/list";
@@ -87,21 +65,19 @@ public class BoardController {
         return "board/register";
     }
 
-
     // WebDataBinder
     // 1. 타입 변환
     // 2. 데이터 검증
     // 결과 - BindingResult
-    @PostMapping("register")
+    @PostMapping("/register")
     public String register(@Valid BoardDTO boardDTO, BindingResult result) {
 
         if(result.hasErrors()) {
             return "board/register";
         }
 
-        Board board = boardService.register(boardDTO);
-
         // 첨부파일 있을 경우 DB에 첨부파일 정보 저장
+        Board board = boardService.register(boardDTO);
         boardAttachService.saveWithFiles(boardDTO, board);
 
         return "redirect:/board/list";
@@ -111,11 +87,10 @@ public class BoardController {
     public String view(Long bno, Model model) {
 
         BoardDTO boardDTO = boardService.get(bno);
-//        List<BoardAttach> attachlist =
-
+        List<BoardAttachDTO> attachDTOList = boardAttachService.getBoardAttachList(bno);
 
         model.addAttribute("board", boardDTO);
-        model.addAttribute("attachList", attachlist);
+        model.addAttribute("attachList", attachDTOList);
 
         return "board/view";
     }
@@ -124,7 +99,10 @@ public class BoardController {
     public String update(Long bno, Model model) {
 
         BoardDTO boardDTO = boardService.get(bno);
+        List<BoardAttachDTO> attachDTOList = boardAttachService.getBoardAttachList(bno);
+
         model.addAttribute("board", boardDTO);
+        model.addAttribute("attachList", attachDTOList);
 
         return "board/update";
     }
@@ -134,14 +112,19 @@ public class BoardController {
 
         boardService.update(boardDTO);
 
+        // 첨부파일 있을 경우 DB에 첨부파일 정보 저장
+        Board board = boardService.register(boardDTO);
+        boardAttachService.modifyWithFiles(boardDTO, board);
+
         return "redirect:/board/view?bno=" + boardDTO.getBno();
 //        return "redirect:/board/view/" + boardDTO.getBno();
     }
 
     @PostMapping("/delete")
-    public String delete(Long bno) {
+//    public String delete(Long bno) {
+    public String delete(BoardDTO boardDTO) {
 
-        boardService.delete(bno);
+        boardService.delete(boardDTO);
 
         return "redirect:/board/list";
     }

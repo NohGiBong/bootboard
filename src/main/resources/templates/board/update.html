@@ -5,6 +5,12 @@
 
 <th:block layout:fragment="content">
 
+    <style layout:fragment="css" th:inline="css">
+        .fieldError {
+            color: red;
+        }
+    </style>
+
     <script layout:fragment="javascript" th:inline="javascript">
         $(document).ready(function() {
             $(".btnList").on("click", function(e){
@@ -18,6 +24,88 @@
                 e.preventDefault();
                 var bno = [[${board.bno}]];
                 location.href = "/board/view?bno=" + bno;
+            });
+        });
+    </script>
+
+
+
+    <script layout:fragment="javascript" th:inline="javascript">
+        $(document).ready(function(){
+            // 업로드 된 이미지를 화면에 보여주는 함수
+            function showUploadImages(arr) {
+                let str = "";
+
+                for(let i = 0; i < arr.length; i++) {
+                    str += `<div>
+                                <img src="/display?fileName=${arr[i].thumbnailURL}">
+                                <button type="button" class="removeBtn" data-name="${arr[i].imageURL}">REMOVE</button>
+                                <input type="hidden" name="fileNames" value="${arr[i].imageURL}">
+                                <input type="hidden" name="thumbnailNames" value="${arr[i].thumbnailURL}">
+                            </div>
+                           `;
+                }
+                $(".uploadResult").append(str);
+                $("[name=uploadFiles]").val("");
+            }
+
+            // 첨부파일 upload 버튼 클릭 이벤트
+            $(".uploadBtn").on("click", function(){
+                const formData = new FormData();    // 가상의 Form 객체를 만들어서 사용
+                let inputFile = $("input[type=file]");
+                let files = inputFile[0].files;
+
+                if(files.length < 1) {
+                    alert("파일 없는디?");
+                    return;
+                }
+
+                for(let i = 0; i < files.length; i++) {
+                    console.log(files[i]);
+                    formData.append("uploadFiles", files[i]);
+                }
+
+                // 실제 업로드 부분
+                $.ajax({
+                    url: "/uploadAjax",
+                    processData: false,
+                    contentType: false,     // multipart/form-data 타입을 사용하기 위해서
+                                            // 반드시 contentType: false로 지정
+                    data: formData,
+                    type: "post",
+                    dataType: "json",
+                    success: function(result) {
+                        showUploadImages(result);
+                    },
+                    error: function(textStatus, errorThrown) {
+                        console.log(textStatus);
+                    }
+                });
+            });
+
+            // REMOVE 버튼 클릭 이벤트
+            $(".uploadResult").on("click", ".removeBtn", function () {
+
+                if(confirm("실제 파일과 DB에서 모두 삭제 ㄱㄱ \n 싫으면 취소")) {
+                    const fileName = $(this).data("name");
+                    const targetDiv = $(this).closest("div");
+                    const attachNo = $(this).data("attachno");
+
+                    $.ajax({
+                        url: "/removeFileDb",
+                        type: "post",
+                        data: {fileName: fileName, attachNo: attachNo},
+                        dataType: "text",
+                        success: function (result) {
+                            if(result === "true") {
+                                targetDiv.remove();
+                            }
+                        },
+                        error: function (textStatus, errorThrown) {
+                            console.log(textStatus);
+                        }
+                    });
+                }
             });
         });
     </script>
@@ -40,16 +128,19 @@
                        aria-label="content" aria-describedby="basic-addon2"
                        th:value="${board.content}">
             </div>
+
             <div class="input-group mb-3">
                 <span class="input-group-text" id="basic-addon3">작성자</span>
                 <input type="text" name="writer" class="form-control" placeholder="작성자"
                        aria-label="writer" aria-describedby="basic-addon3"
                        th:value="${board.writer}">
             </div>
-            <div class="input-group mb-3">
-                <input type="file" multiple>
+            <div class="in
+            put-group mb-3">
+                <input name="uploadFiles" type="file" multiple>
                 <button type="button" class="uploadBtn">Upload</button>
             </div>
+
             <div class="input-group mb-3">
                 <button type="submit" class="btn btn-secondary" style="margin-right: 10px;">수정</button>
 <!--                <button type="button" class="btn btn-primary" style="margin-right: 10px;">삭제</button>-->
@@ -57,12 +148,18 @@
                 <button type="submit" class="btn btn-dark btnBack" style="margin-right: 10px;">돌아가기</button>
                 <button type="submit" class="btn btn-primary btnList" style="margin-right: 10px;">목록</button>
             </div>
-<!--            <div class="uploadResult">-->
-<!--                <div>-->
-<!--                    <img>-->
-<!--                    -->
-<!--                </div>-->
-<!--            </div>-->
+
+            <div class="uploadResult">
+                <th:block th:each="attach : ${attachList}">
+                    <div th:if="${attach.fileName != null && attach.fileName.length() > 0}">
+                        <img th:src="|/display?fileName=${attach.thumbnailName}|">
+                        <button type="button" class="removeBtn"
+                            th:data-name="${attach.fileName}"
+                            th:data-type="modify"
+                            th:data-attachno="${attach.attachNo}">REMOVE</button>
+                    </div>
+                </th:block>
+            </div>
         </form>
     </div>
 </th:block>

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+            xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+            layout:decorate="~{layouts/layout1}"
+            xmlns:sec="http://www.thymeleaf/extras/spring-security">
+
+<th:block layout:fragment="content">
+    <div class="p-3">
+        <h1>메인 페이지</h1>
+        <div sec:authorize="hasRole('USER')">Has USER Role</div>
+        <div sec:authorize="hasRole('ADMIN')">Has ADMIN Role</div>
+
+        <div sec:authorize="isAuthenticated()">
+            인증(로그인)을 했을 때 해당 텍스트가 보여짐
+        </div>
+
+        <div sec:authorize="isAuthenticated()">
+            Authenticated username :
+            <div sec:authentication="name"></div>
+            Authenticated user roles :
+            <div sec:authentication="principal.authorities"></div>
+        </div>
+    </div>
+</th:block>
+
+</html>

@@ -16,7 +16,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Board {
+public class Board extends BaseEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,13 +29,6 @@ public class Board {
 
     @Column(nullable = false)
     private String writer;
-
-    @Column(updatable = false)
-    @CreationTimestamp
-    private LocalDateTime regDate;
-
-    @UpdateTimestamp
-    private LocalDateTime updateDate;
 
     @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE)
     List<Reply> replyList;
