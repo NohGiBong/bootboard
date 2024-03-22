@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+            xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+            layout:decorate="~{layouts/layout1}">
+
+<th:block layout:fragment="content">
+
+    <script layout:fragment="javascript" th:inline="javascript">
+        $(document).ready(function(){
+            $("[type=submit]").on("click", function(e) {
+                e.preventDefault();
+
+                const password1 = $("#password");
+                const password2 = $("#password2");
+
+                if(password1.val().length < 1) {
+                    alert("비번은 무조건");
+                    password1.focus();
+                    return false;
+                }
+
+                if(password2.val().length < 1) {
+                    alert("비밀번호 확인을 입력해주세요.");
+                    password2.focus();
+                    return false;
+                }
+
+                if(password1.val() !== password2.val()) {
+                    alert("비번 일치 X");
+                    password2.focus();
+                    return false;
+                }
+
+                // 이상 없으면 submit 진행
+                $("form").submit();
+            });
+        });
+    </script>
+
+    <div class="p-3">
+        <h1>비번 바꾸는 곳</h1>
+        <form role="form" method="post" action="/member/modify">
+            <div class="form-group">
+                <label th:for="password">비밀번호</label>
+                <input type="password" id="password" name="password" class="form-control" placeholder="비밀번호를 입력해주세요.">
+            </div>
+            <div class="form-group">
+                <label th:for="password2">비밀번호 확인</label>
+                <input type="password" id="password2" name="password2" class="form-control" placeholder="비밀번호를 한번 더 입력해주세요.">
+            </div>
+            <div>
+                <button type="submit" class="btn btn-primary">변경</button>
+            </div>
+        </form>
+    </div>
+</th:block>
+
+</html>
+
+
+
+

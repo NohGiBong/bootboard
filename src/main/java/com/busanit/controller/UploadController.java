@@ -144,7 +144,7 @@ public class UploadController {
         }
     }
 
-    @PostMapping("/removeFileDb")
+    @PostMapping("/removeFileWithDb")
     public ResponseEntity<Boolean> removeFileWithDb(String fileName, Long attachNo) {
         String srcFileName = null;
 

@@ -1,14 +1,18 @@
 package com.busanit.entity;
 
 import com.busanit.constant.Role;
+import com.busanit.domain.MemberRegFormDTO;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Entity
 @Table(name="member")
 @Getter
 @Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Member extends BaseEntity {
 
     @Id
@@ -33,6 +37,25 @@ public class Member extends BaseEntity {
     // 소셜 로그인 여부
     private boolean social;
 
-
+    // 일반 폼 회원 생성
+    public static Member createMember(MemberRegFormDTO regFormDTO, PasswordEncoder passwordEncoder) {
+        String password = passwordEncoder.encode(regFormDTO.getPassword());
+        return Member.builder()
+                .name(regFormDTO.getName())
+                .email(regFormDTO.getEmail())
+                .address(regFormDTO.getAddress())
+                .password(password)
+                .role(Role.USER)
+                .social(false)
+                .build();
+    }
 
 }
+
+
+
+
+
+
+
+

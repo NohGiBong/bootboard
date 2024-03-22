@@ -39,11 +39,11 @@
                 for(let i = 0; i < arr.length; i++) {
                     str += `<div>
                                 <img src="/display?fileName=${arr[i].thumbnailURL}">
-                                <button type="button" class="removeBtn" data-name="${arr[i].imageURL}">REMOVE</button>
+                                <button type="button" class="removeBtn" data-name="${arr[i].imageURL}" data-type="new">REMOVE</button>
                                 <input type="hidden" name="fileNames" value="${arr[i].imageURL}">
                                 <input type="hidden" name="thumbnailNames" value="${arr[i].thumbnailURL}">
                             </div>
-                           `;
+                            `;
                 }
                 $(".uploadResult").append(str);
                 $("[name=uploadFiles]").val("");
@@ -84,24 +84,32 @@
             });
 
             // REMOVE 버튼 클릭 이벤트
-            $(".uploadResult").on("click", ".removeBtn", function () {
+            $(".uploadResult").on("click", ".removeBtn", function() {
+                let dataType = $(this).data("type");
+                let confirmMessage = "실제 파일과 DB에서 모두 삭제 ㄱㄱ \n 싫으면 취소";
+                let ajaxUrl = "/removeFileWithDb";
 
-                if(confirm("실제 파일과 DB에서 모두 삭제 ㄱㄱ \n 싫으면 취소")) {
+                if(dataType == "new") {
+                    confirmMessage = "삭제하시겠습니까?";
+                    ajaxUrl = "/removeFile";
+                }
+
+                if(confirm(confirmMessage)) {
                     const fileName = $(this).data("name");
                     const targetDiv = $(this).closest("div");
                     const attachNo = $(this).data("attachno");
 
                     $.ajax({
-                        url: "/removeFileDb",
+                        url: ajaxUrl,
                         type: "post",
                         data: {fileName: fileName, attachNo: attachNo},
                         dataType: "text",
-                        success: function (result) {
+                        success: function(result) {
                             if(result === "true") {
                                 targetDiv.remove();
                             }
                         },
-                        error: function (textStatus, errorThrown) {
+                        error: function(textStatus, errorThrown) {
                             console.log(textStatus);
                         }
                     });
@@ -109,7 +117,6 @@
             });
         });
     </script>
-
 
     <div class="container p-3">
         <h3>게시글 수정</h3>
@@ -128,19 +135,16 @@
                        aria-label="content" aria-describedby="basic-addon2"
                        th:value="${board.content}">
             </div>
-
             <div class="input-group mb-3">
                 <span class="input-group-text" id="basic-addon3">작성자</span>
                 <input type="text" name="writer" class="form-control" placeholder="작성자"
                        aria-label="writer" aria-describedby="basic-addon3"
                        th:value="${board.writer}">
             </div>
-            <div class="in
-            put-group mb-3">
+            <div class="input-group mb-3">
                 <input name="uploadFiles" type="file" multiple>
                 <button type="button" class="uploadBtn">Upload</button>
             </div>
-
             <div class="input-group mb-3">
                 <button type="submit" class="btn btn-secondary" style="margin-right: 10px;">수정</button>
 <!--                <button type="button" class="btn btn-primary" style="margin-right: 10px;">삭제</button>-->
@@ -150,17 +154,21 @@
             </div>
 
             <div class="uploadResult">
-                <th:block th:each="attach : ${attachList}">
-                    <div th:if="${attach.fileName != null && attach.fileName.length() > 0}">
-                        <img th:src="|/display?fileName=${attach.thumbnailName}|">
-                        <button type="button" class="removeBtn"
+            <th:block th:each="attach : ${attachList}">
+                <div th:if="${attach.fileName != null && attach.fileName.length() > 0}">
+                    <img th:src="|/display?fileName=${attach.thumbnailName}|">
+                    <button type="button" class="removeBtn"
                             th:data-name="${attach.fileName}"
                             th:data-type="modify"
                             th:data-attachno="${attach.attachNo}">REMOVE</button>
-                    </div>
-                </th:block>
+                </div>
+            </th:block>
             </div>
         </form>
     </div>
 </th:block>
 </html>
+
+
+
+
